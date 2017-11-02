@@ -1,0 +1,7 @@
+
+Tinker commands for creating data...
+
+1. create Threads:
+    - $threads = factory('App\Thread', 50)->create();
+2. create Replies:
+    - $threads->each(function($thread) {factory('App\Reply', 10)->create(['thread_id' => $thread->id]); });
