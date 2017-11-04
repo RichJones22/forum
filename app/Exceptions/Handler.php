@@ -40,14 +40,16 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @param Exception $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws Exception
      */
     public function render($request, Exception $exception)
     {
+        // added the below, see episode #4.  Laravel does not throw exception if route not found...
+        if (app()->environment() === 'testing') throw $exception;
+
         return parent::render($request, $exception);
     }
 }
