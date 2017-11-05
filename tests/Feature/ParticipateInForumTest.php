@@ -10,6 +10,9 @@ use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
+/**
+ * Class ParticipateInForumTest.
+ */
 class ParticipateInForumTest extends TestCase
 {
     use DatabaseMigrations;
@@ -31,11 +34,11 @@ class ParticipateInForumTest extends TestCase
     /** @test */
     public function an_authenticated_user_may_participate_in_forum_threads()
     {
-        $this->be($user = factory(User::class)->create()); // create persists the db
-                                                           // make does not...
+        $this->be($user = create(User::class)); // create persists the db
+                                                     // make does not...
 
         /** @var Thread $thread */
-        $thread = factory(Thread::class)->create();
+        $thread = create(Thread::class);
 
         /** @var Reply $reply */
         $reply = factory(Reply::class)->make();  // just make a reply... is not persisted to db...

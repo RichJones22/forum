@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -8,6 +10,9 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
 
+/**
+ * Class ThreadTest.
+ */
 class ThreadTest extends TestCase
 {
     use DatabaseMigrations;
@@ -19,7 +24,7 @@ class ThreadTest extends TestCase
     {
         parent::setUp();
 
-        $this->setThread(factory('App\Thread')->create());
+        $this->setThread(create(Thread::class));
     }
 
     /** @test */

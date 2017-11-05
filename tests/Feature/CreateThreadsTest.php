@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Thread;
-use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -19,7 +18,7 @@ class CreateThreadsTest extends TestCase
     {
         $this->expectException('Illuminate\Auth\AuthenticationException');
 
-        $thread = factory(Thread::class)->make();
+        $thread = make(Thread::class);
 
         $this->post('/threads', $thread->toArray());
     }
@@ -27,9 +26,10 @@ class CreateThreadsTest extends TestCase
     /** @test */
     public function an_authenticated_user_can_create_new_form_threads()
     {
-        $this->actingAs(factory(User::class)->create());
+//        $this->actingAs(create(User::class));
+        $this->signIn();
 
-        $thread = factory(Thread::class)->make();
+        $thread = make(Thread::class);
 
         $this->post('/threads', $thread->toArray());
 
