@@ -8,6 +8,9 @@ use App\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
+/**
+ * Class ThreadsController.
+ */
 class ThreadsController extends Controller
 {
     /**
@@ -15,9 +18,16 @@ class ThreadsController extends Controller
      */
     private $thread;
 
+    /**
+     * ThreadsController constructor.
+     *
+     * @param Thread $thread
+     */
     public function __construct(Thread $thread)
     {
         $this->setThread($thread);
+
+        $this->middleware('auth')->only('store');
     }
 
     /**
@@ -55,6 +65,16 @@ class ThreadsController extends Controller
      */
     public function store(Request $request)
     {
+        /** @var Thread $thread */
+        $thread = $this->getThread()->newInstance([
+            'user_id' => $request->get('user_id'),
+            'title' => $request->get('title'),
+            'body' => $request->get('body'),
+        ]);
+
+        $thread->save();
+
+        return redirect($this->getThread()->path());
     }
 
     /**
