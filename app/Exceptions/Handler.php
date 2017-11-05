@@ -48,7 +48,8 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         // added the below, see episode #4.  Laravel does not throw exception if route not found...
-        if (app()->environment() === 'testing') throw $exception;
+        // now using @adamwathan in the TestCase.php file.
+//        if (app()->environment() === 'testing') throw $exception;
 
         return parent::render($request, $exception);
     }

@@ -27,7 +27,7 @@ class ThreadsController extends Controller
     {
         $this->setThread($thread);
 
-        $this->middleware('auth')->only('store');
+        $this->middleware('auth')->except(['index', 'show']);
     }
 
     /**
@@ -54,6 +54,7 @@ class ThreadsController extends Controller
      */
     public function create()
     {
+        return view('threads.create');
     }
 
     /**
@@ -67,7 +68,7 @@ class ThreadsController extends Controller
     {
         /** @var Thread $thread */
         $thread = $this->getThread()->newInstance([
-            'user_id' => $request->get('user_id'),
+            'user_id' => auth()->id(),
             'title' => $request->get('title'),
             'body' => $request->get('body'),
         ]);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -24,9 +26,17 @@ class CreateThreadsTest extends TestCase
     }
 
     /** @test */
+    public function guest_cannot_see_the_create_thread_pages()
+    {
+        return $this->withExceptionHandling()
+            ->get('/threads/create')
+            ->assertRedirect('/login');
+    }
+
+    /** @test */
     public function an_authenticated_user_can_create_new_form_threads()
     {
-//        $this->actingAs(create(User::class));
+        //        $this->actingAs(create(User::class));
         $this->signIn();
 
         $thread = make(Thread::class);
