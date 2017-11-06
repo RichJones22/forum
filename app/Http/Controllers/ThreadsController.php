@@ -69,21 +69,23 @@ class ThreadsController extends Controller
         /** @var Thread $thread */
         $thread = $this->getThread()->newInstance([
             'user_id' => auth()->id(),
+            'channel_id' => $request->get('channel_id'),
             'title' => $request->get('title'),
             'body' => $request->get('body'),
         ]);
 
         $thread->save();
 
-        return redirect($this->getThread()->path());
+        return redirect($thread->path());
     }
 
     /**
+     * @param $channelId
      * @param Thread $thread
      *
      * @return Thread
      */
-    public function show(Thread $thread)
+    public function show($channelId, Thread $thread)
     {
         return view('threads.show', compact('thread'));
     }

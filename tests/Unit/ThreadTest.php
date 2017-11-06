@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Channel;
 use App\Thread;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -28,15 +29,27 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function a_thread_has_replies()
+    public function a_thread_can_make_a_string_path()
     {
-        $this->assertInstanceOf(Collection::class, $this->getThread()->replies);
+        $thread = create(Thread::class);
+
+        $this->assertSame(
+            '/threads/'.
+            $thread->channel->slug.'/'.
+            $thread->id, $thread->path()
+        );
     }
 
     /** @test */
     public function a_thread_as_a_creator()
     {
         $this->assertInstanceOf(user::class, $this->getThread()->creator);
+    }
+
+    /** @test */
+    public function a_thread_has_replies()
+    {
+        $this->assertInstanceOf(Collection::class, $this->getThread()->replies);
     }
 
     /** @test */
@@ -50,10 +63,18 @@ class ThreadTest extends TestCase
         $this->assertCount(1, $this->getThread()->replies);
     }
 
+    /** @test */
+    public function a_thread_belongs_to_a_channel()
+    {
+        $thread = create(Thread::class);
+
+        $this->assertInstanceOf(Channel::class, $thread->channel);
+    }
+
     /**
      * @return Thread
      */
-    public function getThread(): Thread
+    protected function getThread(): Thread
     {
         return $this->thread;
     }
@@ -63,7 +84,7 @@ class ThreadTest extends TestCase
      *
      * @return ThreadTest
      */
-    public function setThread(Thread $thread): ThreadTest
+    protected function setThread(Thread $thread): ThreadTest
     {
         $this->thread = $thread;
 

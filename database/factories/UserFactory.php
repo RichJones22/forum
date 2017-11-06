@@ -1,5 +1,8 @@
 <?php
 
+use App\Channel;
+use App\Thread;
+use App\User;
 use Faker\Generator as Faker;
 
 /*
@@ -27,20 +30,34 @@ $factory->define(App\User::class, function (Faker $faker) {
 $factory->define(App\Thread::class, function($faker) {
     return [
         'user_id' => function() {
-            return factory('App\User')->create()->id;
+            return factory(User::class)->create()->id;
+        },
+        'channel_id' => function()
+        {
+            return factory(Channel::class)->create()->id;
         },
         'title' => $faker->sentence,
         'body' => $faker->paragraph
     ];
 });
 
+$factory->define(Channel::class, function($faker) {
+    $name = $faker->word;
+
+    return [
+        'name' => $name,
+        'slug' => $name
+    ];
+});
+
+
 $factory->define(App\Reply::class, function($faker) {
     return [
         'thread_id' => function() {
-            return factory('App\Thread')->create()->id;
+            return factory(Thread::class)->create()->id;
         },
         'user_id' => function() {
-            return factory('App\User')->create()->id;
+            return factory(User::class)->create()->id;
         },
         'body' => $faker->paragraph
     ];

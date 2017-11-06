@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
@@ -19,7 +21,7 @@ class Thread extends Model
      */
     public function path()
     {
-        return '/threads/'.$this->getKey();
+        return "/threads/{$this->channel->slug}/{$this->getKey()}";
     }
 
     /**
@@ -28,6 +30,14 @@ class Thread extends Model
     public function replies()
     {
         return $this->hasMany(Reply::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function channel()
+    {
+        return $this->belongsTo(Channel::class);
     }
 
     /**
