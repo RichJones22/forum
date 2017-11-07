@@ -27,7 +27,7 @@ class ParticipateInForumTest extends TestCase
     /** @test */
     public function an_authenticated_user_may_participate_in_forum_threads()
     {
-//        $this->be($user = create(User::class)); // create persists the db
+        //        $this->be($user = create(User::class)); // create persists the db
                                                      // make does not...
 
         $this->signIn();
@@ -42,5 +42,21 @@ class ParticipateInForumTest extends TestCase
 
         $this->get($thread->path())
             ->assertSee($reply->body);
+    }
+
+    /** @test */
+    public function a_reply_requires_a_body()
+    {
+        $this->withExceptionHandling()
+            ->signIn();
+
+        /** @var Thread $thread */
+        $thread = create(Thread::class);
+
+        /** @var Reply $reply */
+        $reply = make(Reply::class, ['body' => null]);
+
+        $this->post($thread->path().'/replies', $reply->toArray())
+            ->assertSessionHasErrors('body');
     }
 }
