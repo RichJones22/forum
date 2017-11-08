@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Channel;
 use App\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,6 +23,8 @@ class ThreadsController extends Controller
      * ThreadsController constructor.
      *
      * @param Thread $thread
+     *
+     * @internal param Channel $channel
      */
     public function __construct(Thread $thread)
     {
@@ -33,16 +36,27 @@ class ThreadsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Channel $channel
+     *
      * @return \Illuminate\Http\Response
+     *
+     * @internal param null $channelSlug
      */
-    public function index()
+    public function index(Channel $channel)
     {
-        /** @var Collection $threads */
-        $threads = $this
-            ->getThread()
-            ->newQuery()
-            ->latest()
-            ->get();
+        /* @var Collection $threads */
+        if ($channel->exists) {
+            $threads = $channel
+                ->threads()
+                ->latest()
+                ->get();
+        } else {
+            $threads = $this
+                ->getThread()
+                ->newQuery()
+                ->latest()
+                ->get();
+        }
 
         return view('threads.index', compact('threads'));
     }
