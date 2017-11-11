@@ -36,7 +36,15 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
+
+                        {{--Threads--}}
                         <li><a href="/threads">All Threads</a></li>
+
+                        {{--New Thread--}}
+                        <li>
+                            <a href="/threads/create">New Thread</a>
+                        </li>
+                        {{--Channels--}}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle"
                                data-toggle="dropdown"
@@ -49,6 +57,8 @@
                                 @endforeach
                             </ul>
                         </li>
+
+
                     </ul>
 
                     <!-- Right Side Of Navbar -->

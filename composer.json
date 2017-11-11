@@ -55,6 +55,9 @@
             "php artisan ide-helper:generate",
             "php artisan ide-helper:meta",
             "php artisan optimize"
+        ],
+        "tinkerLoad": [
+            "php artisan db:seed --class=RunTinkerLoadCommand"
         ]
     },
     "config": {
