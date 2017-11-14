@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Channel;
 use App\Thread;
+use App\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -18,17 +20,23 @@ class ThreadsController extends Controller
      * @var Thread
      */
     private $thread;
+    /**
+     * @var User
+     */
+    private $user;
 
     /**
      * ThreadsController constructor.
      *
      * @param Thread $thread
      *
+     * @param User $user
      * @internal param Channel $channel
      */
-    public function __construct(Thread $thread)
+    public function __construct(Thread $thread, User $user)
     {
         $this->setThread($thread);
+        $this->setUser($user);
 
         $this->middleware('auth')->except(['index', 'show']);
     }
@@ -48,15 +56,26 @@ class ThreadsController extends Controller
         if ($channel->exists) {
             $threads = $channel
                 ->threads()
-                ->latest()
-                ->get();
+                ->latest();
         } else {
             $threads = $this
                 ->getThread()
                 ->newQuery()
-                ->latest()
-                ->get();
+                ->latest();
         }
+
+        if ($username = request('by')) {
+            $user = $this
+                ->getUser()
+                ->newQuery()
+                ->where('name', $username)
+                ->firstOrFail();
+
+            $threads->where('user_id', $user->id);
+        }
+
+        /** @var Builder $threads */
+        $threads = $threads->get();
 
         return view('threads.index', compact('threads'));
     }
@@ -160,6 +179,26 @@ class ThreadsController extends Controller
     public function setThread(Thread $thread): ThreadsController
     {
         $this->thread = $thread;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return ThreadsController
+     */
+    public function setUser(User $user): ThreadsController
+    {
+        $this->user = $user;
 
         return $this;
     }
