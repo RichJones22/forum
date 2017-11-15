@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Channel;
+use App\Filters\ThreadFilters;
 use App\Thread;
 use App\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 /**
  * Class ThreadsController.
@@ -29,8 +28,8 @@ class ThreadsController extends Controller
      * ThreadsController constructor.
      *
      * @param Thread $thread
+     * @param User   $user
      *
-     * @param User $user
      * @internal param Channel $channel
      */
     public function __construct(Thread $thread, User $user)
@@ -44,38 +43,16 @@ class ThreadsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param Channel $channel
+     * @param Channel       $channel
+     * @param ThreadFilters $threadFilters
      *
      * @return \Illuminate\Http\Response
      *
      * @internal param null $channelSlug
      */
-    public function index(Channel $channel)
+    public function index(Channel $channel, ThreadFilters $threadFilters)
     {
-        /* @var Collection $threads */
-        if ($channel->exists) {
-            $threads = $channel
-                ->threads()
-                ->latest();
-        } else {
-            $threads = $this
-                ->getThread()
-                ->newQuery()
-                ->latest();
-        }
-
-        if ($username = request('by')) {
-            $user = $this
-                ->getUser()
-                ->newQuery()
-                ->where('name', $username)
-                ->firstOrFail();
-
-            $threads->where('user_id', $user->id);
-        }
-
-        /** @var Builder $threads */
-        $threads = $threads->get();
+        $threads = $this->getThreads($channel, $threadFilters);
 
         return view('threads.index', compact('threads'));
     }
@@ -201,5 +178,30 @@ class ThreadsController extends Controller
         $this->user = $user;
 
         return $this;
+    }
+
+    /**
+     * @param Channel       $channel
+     * @param ThreadFilters $threadFilters
+     *
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    protected function getThreads(Channel $channel, ThreadFilters $threadFilters)
+    {
+        $threads = $this
+            ->getThread()
+            ->newQuery()
+            ->latest();
+
+        if ($channel->exists) {
+            $threads->where('channel_id', $channel->id);
+        }
+
+        // not liking the scopes things on the Models...
+        // seems too hidden to me...
+        // calls scopeFilter on Thread
+        $threads = $threads->filter($threadFilters)->get();
+
+        return $threads;
     }
 }
