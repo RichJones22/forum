@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Filters\ThreadFilters;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,6 +17,16 @@ class Thread extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        // exposes Threads->replies_count to all queries...
+        static::addGlobalScope('replyCount', function (Builder $builder) {
+            $builder->withCount('replies');
+        });
+    }
 
     /**
      * @return string
