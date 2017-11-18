@@ -14,7 +14,7 @@ class ThreadFilters extends Filters
     /**
      * @var array
      */
-    protected $filters = ['by'];
+    protected $filters = ['by', 'popular'];
 
     /**
      * @param $username
@@ -23,7 +23,7 @@ class ThreadFilters extends Filters
      *
      * @internal param Builder $builder
      */
-    public function by($username)
+    protected function by($username)
     {
         $user = $this
             ->getUser()
@@ -32,5 +32,18 @@ class ThreadFilters extends Filters
             ->firstOrFail();
 
         return $this->getBuilder()->where('user_id', $user->id);
+    }
+
+    /**
+     * filter by most popular threads...
+     *
+     * @return mixed
+     */
+    protected function popular()
+    {
+        // remove existing order on $builder object, which will clear out existing order by's that have been set.
+        $this->getBuilder()->getQuery()->orders = [];
+
+        return $this->getBuilder()->orderby('replies_count', 'desc');
     }
 }

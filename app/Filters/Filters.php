@@ -23,7 +23,7 @@ abstract class Filters
      */
     protected $request;
     /**
-     * @var
+     * @var Builder
      */
     protected $builder;
     /**
@@ -84,9 +84,9 @@ abstract class Filters
     }
 
     /**
-     * @return mixed
+     * @return Builder
      */
-    public function getBuilder()
+    public function getBuilder(): Builder
     {
         return $this->builder;
     }
