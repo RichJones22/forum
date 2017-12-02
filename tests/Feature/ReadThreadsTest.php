@@ -93,6 +93,13 @@ class ReadThreadsTest extends TestCase
 
         $response = $this->getJson('/threads?popular=1')->json();
 
-        $this->assertSame([3, 2, 0], array_column($response, 'replies_count'));
+        $response = array_column($response, 'replies_count');
+
+        // convert string to int.
+        array_walk($response, function (&$v) {
+            $v = intval($v);
+        });
+
+        $this->assertSame([3, 2, 0], $response);
     }
 }
