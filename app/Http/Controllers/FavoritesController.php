@@ -30,10 +30,14 @@ class FavoritesController extends Controller
 
     /**
      * @param Reply $reply
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function show(Reply $reply)
     {
         $reply->favorite();
+
+        return back();
     }
 
     /**

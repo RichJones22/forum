@@ -14,7 +14,24 @@ class Reply extends Model
     /**
      * @var array
      */
+    protected $localAttributes;
+
+    /**
+     * @var array
+     */
     protected $guarded = [];
+
+    /**
+     * Reply constructor.
+     *
+     * @param array $attributes
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->localAttributes = ['user_id' => auth()->id()];
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -34,10 +51,16 @@ class Reply extends Model
 
     public function favorite()
     {
-        $attributes = ['user_id' => auth()->id()];
-
-        if ( ! $this->favorites()->where($attributes)->exists()) {
-            $this->favorites()->create($attributes);
+        if ( ! $this->favorites()->where($this->localAttributes)->exists()) {
+            $this->favorites()->create($this->localAttributes);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFavorited()
+    {
+        return $this->favorites()->where($this->localAttributes)->exists();
     }
 }
