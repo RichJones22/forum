@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Reply extends Model
 {
+    use Favorites;
+
     /**
      * @var array
      */
@@ -20,6 +22,11 @@ class Reply extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * @var array
+     */
+    protected $with = ['owner', 'favorites'];
 
     /**
      * Reply constructor.
@@ -39,28 +46,5 @@ class Reply extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function favorites()
-    {
-        return $this->morphMany(Favorite::class, 'favorited');
-    }
-
-    public function favorite()
-    {
-        if ( ! $this->favorites()->where($this->localAttributes)->exists()) {
-            $this->favorites()->create($this->localAttributes);
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFavorited()
-    {
-        return $this->favorites()->where($this->localAttributes)->exists();
     }
 }

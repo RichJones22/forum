@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Channel;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
+use Barryvdh\Debugbar\ServiceProvider as BarryDebugBarServiceProvider;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use View;
 
@@ -18,10 +20,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         View::composer('*', function ($view) {
-            $view->with('channels', Channel::all());
-        });
 
-//        View::share('channels', Channel::all());
+            // don't need to call Channel every time, so cache it...
+            $channels = Cache::rememberForever('channels', function(){
+               return Channel::all();
+            });
+
+            $view->with('channels', $channels);
+        });
     }
 
     /**
@@ -31,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->environment() !== 'production') {
             $this->app->register(IdeHelperServiceProvider::class);
+            $this->app->register(BarryDebugBarServiceProvider::class);
         }
     }
 }
