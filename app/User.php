@@ -1,10 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
+/**
+ * Class User.
+ */
 class User extends Authenticatable
 {
     use Notifiable;
@@ -26,4 +29,20 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'name';
+    }
+
+    /**
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function threads()
+    {
+        return $this->hasMany(Thread::class)->latest();
+    }
 }
