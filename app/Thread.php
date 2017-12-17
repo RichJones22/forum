@@ -31,6 +31,13 @@ class Thread extends Model
         static::addGlobalScope('replyCount', function (Builder $builder) {
             $builder->withCount('replies');
         });
+
+        // when deleting a thread, delete all associated replies...
+        // this is a model event handler; I'm also tempted to do it as a cascading delete
+        // off of the Tread table itself.
+        static::deleting(function ($thread) {
+            $thread->replies->first()->delete();
+        });
     }
 
     /**

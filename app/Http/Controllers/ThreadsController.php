@@ -11,6 +11,9 @@ use App\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 /**
  * Class ThreadsController.
@@ -106,12 +109,12 @@ class ThreadsController extends Controller
     }
 
     /**
-     * @param $channelId
+     * @param $channel
      * @param Thread $thread
      *
      * @return Thread
      */
-    public function show($channelId, Thread $thread)
+    public function show($channel, Thread $thread)
     {
         return view('threads.show', [
             'thread' => $thread,
@@ -135,10 +138,26 @@ class ThreadsController extends Controller
     }
 
     /**
+     * @param $channel
      * @param Thread $thread
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|Response
      */
-    public function destroy(Thread $thread)
+    public function destroy($channel, Thread $thread)
     {
+        try {
+            DB::transaction(function () use ($thread) {
+                $thread->delete();
+            });
+        } catch (Throwable $t) {
+            return response('failed deleting thread...', 500);
+        }
+
+        if (request()->wantsJson()) {
+            return response([], 204);
+        }
+
+        return redirect('/threads');
     }
 
     /**
