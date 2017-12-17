@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Channel;
 use App\Reply;
 use App\Thread;
+use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -70,24 +71,40 @@ class CreateThreadsTest extends TestCase
     }
 
     /** @test */
-    public function guests_cannot_delete_threads()
+    public function unauthorized_users_may_not_delete_threads()
     {
         $this->withExceptionHandling();
 
         $thread = create(Thread::class);
 
-        $response = $this->delete($thread->path());
 
-        $response->assertRedirect('/login');
+        // not signed in; should fail..
+        $this->delete($thread->path())
+            ->assertRedirect('/login');
+
+        // signed in; should also fail...
+        $this->signIn();
+        $this->delete($thread->path())
+            ->assertStatus(403);
+
+
     }
 
     /** @test */
-    public function a_thread_can_be_deleted()
+    public function authorized_users_can_delete_threads()
     {
-        $this->signIn();
+        // as of 12-17-2017, we are using Gate::before in the
+        // ApplicationServiceProvider, such that the user named 'John Doe'
+        // can delete any thread...
+        //
+        // this is why I'm creating a user with a specific name of
+        // 'John Doe'
+        $user = create(User::class, ['name' => 'John Doe']);
+
+        $this->signIn($user);
 
         /** @var Thread $thread */
-        $thread = create(Thread::class);
+        $thread = create(Thread::class, ['user_id' => auth()->id()]);
         $reply = create(Reply::class, ['thread_id' => $thread->id]);
 
         $response = $this->json('DELETE', $thread->path());

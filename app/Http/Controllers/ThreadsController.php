@@ -10,6 +10,7 @@ use App\Thread;
 use App\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -141,16 +142,24 @@ class ThreadsController extends Controller
      * @param $channel
      * @param Thread $thread
      *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|Response
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|Redirector|Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy($channel, Thread $thread)
     {
+        // this calls the AuthServiceProvider Auth:before() method
+        $this->authorize('update', $thread);
+
         try {
             DB::transaction(function () use ($thread) {
+                // Note: that the below delete() method is calling the model
+                // event handler (deleting), which will delete the replies for
+                // this thread.
                 $thread->delete();
             });
         } catch (Throwable $t) {
-            return response('failed deleting thread...', 500);
+            return response("failed deleting thread... File: {$t->getFile()} Line: {$t->getLine()}", 500);
         }
 
         if (request()->wantsJson()) {

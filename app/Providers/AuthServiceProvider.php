@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Gate;
+use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
+/**
+ * Class AuthServiceProvider.
+ */
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -13,18 +19,23 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        'App\Thread' => 'App\Policies\ThreadPolicy',
     ];
 
     /**
      * Register any authentication / authorization services.
-     *
-     * @return void
      */
     public function boot()
     {
         $this->registerPolicies();
 
-        //
+        Gate::before(function (User $user) {
+            // returning true from a 'before' method means you are authorized
+            // for everything...
+            if ($user->name === 'John Doe') {
+                return true;
+            }
+            return false;
+        });
     }
 }
