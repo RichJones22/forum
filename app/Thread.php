@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Thread extends Model
 {
+    use RecordsActivity;
+
     /**
      * @var array
      */
@@ -35,9 +37,13 @@ class Thread extends Model
         // when deleting a thread, delete all associated replies...
         // this is a model event handler; I'm also tempted to do it as a cascading delete
         // off of the Tread table itself.
-        static::deleting(function ($thread) {
+        static::deleting(function (Thread $thread) {
             $thread->replies->first()->delete();
         });
+
+        // weird... need the below Activity() call, otherwise the call to
+        // the trait bootRecordsActivity() will not work?
+        app(Activity::class);
     }
 
     /**

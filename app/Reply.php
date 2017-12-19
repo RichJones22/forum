@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Reply extends Model
 {
-    use Favorites;
+    use Favorites, RecordsActivity;
 
     /**
      * @var array
