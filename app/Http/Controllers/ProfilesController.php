@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\User;
+use Illuminate\Support\Collection;
 
 /**
  * Class ProfilesController.
@@ -20,7 +21,25 @@ class ProfilesController extends Controller
     {
         return view('profiles.show', [
             'profileUser' => $user,
-            'threads' => $user->threads()->paginate(10),
+            'activities' => $this->getActivity($user),
         ]);
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return Collection
+     */
+    protected function getActivity(User $user): Collection
+    {
+        return $user
+            ->activity()
+            ->latest()
+            ->with('subject')
+            ->take(50)
+            ->get()
+            ->groupBy(function ($x) {
+                return $x->created_at->format('Y-m-d');
+            });
     }
 }
