@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -8,8 +10,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 /**
- * Class ProfilesTest
- * @package Tests\Feature
+ * Class ProfilesTest.
  */
 class ProfilesTest extends TestCase
 {
@@ -18,20 +19,24 @@ class ProfilesTest extends TestCase
     /** @test */
     public function a_user_has_a_profile()
     {
-        $user = create(User::class);
+        $this->signIn();
 
-        $this->get("/profiles/$user->name")
+        create(Thread::class, ['user_id' => auth()->id()]);
+
+        $user = (new User())->newQuery()->where(['id' => auth()->id()])->first();
+
+        $this->get('/profiles/'.auth()->user()->name)
             ->assertSee($user->name);
     }
 
     /** @test */
     public function profiles_display_all_threads_created_by_associated_user()
     {
-        $user = create(User::class);
+        $this->signIn();
 
-        $thread = create(Thread::class, ['user_id' => $user->id]);
+        $thread = create(Thread::class, ['user_id' => auth()->id()]);
 
-        $this->get("/profiles/$user->name")
+        $this->get('/profiles/'.auth()->user()->name)
             ->assertSee($thread->title)
             ->assertSee($thread->body);
     }

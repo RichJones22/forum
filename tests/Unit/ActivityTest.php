@@ -7,8 +7,11 @@ namespace Tests\Feature;
 use App\Activity;
 use App\Reply;
 use App\Thread;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 /**
@@ -48,5 +51,29 @@ class ActivityTest extends TestCase
         create(Reply::class);
 
         $this->assertSame(2, (new Activity())->newQuery()->count());
+    }
+
+    /** @test */
+    public function it_fetches_a_feed_for_any_user()
+    {
+        $this->signIn();
+
+        create(Thread::class, ['user_id' => auth()->id()], 2);
+
+        /** @var User $user */
+        $user = (new User())->newQuery()->where(['id' => auth()->id()])->first();
+
+        $user->activity()->first()->update(['created_at' => Carbon::now()->subWeek()]);
+
+        /** @var Collection $feed */
+        $feed = (new Activity())->feed($user);
+
+        $this->assertTrue($feed->keys()->contains(
+            Carbon::now()->format('Y-m-d')
+        ));
+
+        $this->assertTrue($feed->keys()->contains(
+            Carbon::now()->subWeek()->format('Y-m-d')
+        ));
     }
 }
