@@ -51,7 +51,9 @@ class Thread extends Model
      */
     public function path()
     {
-        return "/threads/{$this->channel->slug}/{$this->getKey()}";
+        $myPath = "/threads/{$this->channel->slug}/{$this->getKey()}";
+
+        return $myPath;
     }
 
     /**

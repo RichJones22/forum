@@ -17,18 +17,24 @@ trait RecordsActivity
         if (auth()->guest()) {
             return;
         }
+
         /** @var Model $model */
         $model = get_class();
 
         // not needed; used to suppress IDE highlighting....
         $recordActivity = 'recordActivity';
-
         foreach (static::getActivitiesToRecord() as $event) {
             // call to model event handler, 'created'
             $model::$event(function ($parent) use ($recordActivity) {
                 $parent->$recordActivity('created');
             });
         }
+
+        // not needed; used to suppress IDE highlighting....
+        $activity = 'activity';
+        $model::deleting(function ($model) use ($activity) {
+            $model->$activity()->delete();
+        });
     }
 
     /**
