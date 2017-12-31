@@ -7,7 +7,16 @@
 
 require('./bootstrap');
 
-//window.Vue = require('vue');
+// global components object
+window.Vue = require('vue');
+
+// events object
+window.events = new Vue();
+
+// global helpers
+window.flash = function (message) {
+    window.events.$emit('flash', message);
+};
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -15,8 +24,8 @@ require('./bootstrap');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-//Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('flash', require('./components/flash.vue'));
 
-//const app = new Vue({
-//    el: '#app'
-//});
+const app = new Vue({
+   el: '#app'
+});
