@@ -9,6 +9,7 @@ use App\Filters\ThreadFilters;
 use App\Thread;
 use App\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
@@ -97,14 +98,12 @@ class ThreadsController extends Controller
         ]);
 
         /** @var Thread $thread */
-        $thread = $this->getThread()->newInstance([
+        $thread = $this->getThread()->newQuery()->create([
             'user_id' => auth()->id(),
             'channel_id' => $request->get('channel_id'),
             'title' => $request->get('title'),
             'body' => $request->get('body'),
         ]);
-
-        $thread->save();
 
         return redirect($thread->path())
             ->with('flash', 'Your thread has been published!');
