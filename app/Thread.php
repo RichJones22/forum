@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Filters\ThreadFilters;
+use App\Http\Caching\PremiseCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,6 +26,11 @@ class Thread extends Model
      */
     protected $with = ['creator', 'channel'];
 
+    /**
+     * Thread constructor.
+     *
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -46,8 +52,40 @@ class Thread extends Model
         // when deleting a thread, delete all associated replies...
         // this is a model event handler; I'm also tempted to do it as a cascading delete
         // off of the Tread table itself.
+        // TODO:  the below seems a bit excessive; is there a better way?
         static::deleting(function (Thread $thread) {
-            $thread->replies()->first()->delete();
+            if ($thread->replies()->exists()) {
+                $cache = app(PremiseCache::class);
+                $activity = app(Activity::class);
+                $favorite = app(Favorite::class);
+
+                $thread->replies()->each(function (Reply $x) use ($cache, $activity, $favorite) {
+                    // clear the cache
+                    $key = $cache->cacheKeyForActivity(auth()->id(), $x->thread->id, $x->id);
+                    $cache->RemovePathFromCache($key);
+
+                    // get all activity subject_type as collection
+                    $activitySubjectType = $activity->newQuery()
+                        ->select('subject_type')
+                        ->where('subject_id', $x->id)
+                        ->get();
+
+                    // delete activity by subject_type
+                    foreach ($activitySubjectType->all() as $act) {
+                        $activity->newQuery()
+                            ->where('subject_type', $act->subject_type)
+                            ->where('subject_id', $x->id)
+                            ->delete();
+                    }
+
+                    $favorite->newQuery()
+                        ->where('favorited_id', $x->id)
+                        ->delete();
+
+                    // delete the reply...
+                    $x->delete();
+                });
+            }
         });
     }
 
