@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Reply;
 use App\Thread;
 
 /**
@@ -37,5 +38,23 @@ class RepliesController extends Controller
         ]);
 
         return back()->with('flash', 'Your reply has been left.');
+    }
+
+    /**
+     * @param Reply $reply
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Exception
+     */
+    public function destroy(Reply $reply)
+    {
+        if ($reply->id !== auth()->id()) {
+            return response([], 403);
+        }
+
+        $reply->delete();
+
+        return back();
     }
 }
