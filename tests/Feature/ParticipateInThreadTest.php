@@ -86,4 +86,33 @@ class ParticipateInThreadTest extends TestCase
 
         $this->assertDatabaseMissing('replies', ['id' => $reply->id]);
     }
+
+    /** @test */
+    public function authorized_users_can_update_replies()
+    {
+        $bodyText = 'You been changed fool.';
+
+        $this->signIn();
+
+        $reply = create(Reply::class, ['user_id' => auth()->id(), 'body' => $bodyText]);
+
+        $this->patch("/replies/{$reply->id}");
+
+        $this->assertDatabaseHas('replies', ['id' => $reply->id, 'body' => $bodyText]);
+    }
+
+    /** @test */
+    public function unauthorized_users_cannot_update_replies()
+    {
+        $this->withExceptionHandling();
+
+        $reply = create(Reply::class);
+
+        $this->patch("/replies/{$reply->id}")
+            ->assertRedirect('login');
+
+        $this->signIn()
+            ->patch("/replies/{$reply->id}")
+            ->assertStatus(403);
+    }
 }

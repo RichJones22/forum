@@ -43,17 +43,37 @@ class RepliesController extends Controller
     /**
      * @param Reply $reply
      *
+     * @return $this|\Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function update(Reply $reply)
+    {
+        if ($reply->user_id !== auth()->id()) {
+            return response([], 403);
+        }
+
+        $reply->update(['body' => request('body')]);
+
+        return $this;
+    }
+
+    /**
+     * @param Reply $reply
+     *
      * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \Exception
      */
     public function destroy(Reply $reply)
     {
-        if ($reply->id !== auth()->id()) {
+        if ($reply->user_id !== auth()->id()) {
             return response([], 403);
         }
 
         $reply->delete();
+
+        if (request()->expectsJson()) {
+            return response(['status' => 'Reply deleted']);
+        }
 
         return back();
     }
