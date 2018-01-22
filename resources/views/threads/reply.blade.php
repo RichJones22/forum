@@ -10,12 +10,7 @@
                 </h5>
 
                 <div>
-                    <form method="post" action="/replies/{{ $reply->id }}/favorites">
-                        {{ csrf_field() }}
-                        <button type="submit" class="btn btn-default" {{ $reply->isFavorited() ? 'disabled' : '' }}>
-                            {{ $reply->getFavoritesCount() }} {{ str_plural('Favorite', $reply->getFavoritesCount()) }}
-                        </button>
-                    </form>
+                    <favorite :reply="{{ $reply }}"></favorite>
                 </div>
             </div>
         </div>

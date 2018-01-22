@@ -1,7 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
+/**
+ * Trait Favorites.
+ */
 /**
  * Trait Favorites.
  */
@@ -22,6 +27,13 @@ trait Favorites
         }
     }
 
+    public function unfavorite()
+    {
+        $attributes = ['user_id' => auth()->id()];
+
+        $this->favorites()->where($attributes)->delete();
+    }
+
     /**
      * @return bool
      */
@@ -31,9 +43,17 @@ trait Favorites
     }
 
     /**
+     * @return bool
+     */
+    public function getIsFavoritedAttribute()
+    {
+        return $this->isFavorited();
+    }
+
+    /**
      * @return int
      */
-    public function getFavoritesCount()
+    public function getFavoritesCountAttribute()
     {
         return $this->favorites->count();
     }

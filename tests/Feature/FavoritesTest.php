@@ -9,6 +9,9 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use Throwable;
 
+/**
+ * Class FavoritesTest.
+ */
 class FavoritesTest extends TestCase
 {
     use DatabaseMigrations;
@@ -32,6 +35,21 @@ class FavoritesTest extends TestCase
         $this->post('replies/'.$reply->id.'/favorites');
 
         $this->assertSame(1, $reply->favorites()->count());
+    }
+
+    /** @test */
+    public function an_authorized_user_can_un_favorite_a_reply()
+    {
+        $this->signIn();
+
+        /** @var Reply $reply */
+        $reply = create(Reply::class);
+
+        $this->post('replies/'.$reply->id.'/favorites');
+        $this->assertSame(1, $reply->favorites()->count());
+
+        $this->delete('replies/'.$reply->id.'/favorites');
+        $this->assertSame(0, $reply->fresh()->favorites()->count());
     }
 
     /** @test */

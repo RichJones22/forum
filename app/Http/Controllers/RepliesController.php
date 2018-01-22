@@ -65,10 +65,9 @@ class RepliesController extends Controller
      */
     public function destroy(Reply $reply)
     {
-        if ($reply->user_id !== auth()->id()) {
+        if ((int) $reply->user_id !== auth()->id()) {
             return response([], 403);
         }
-
         $reply->delete();
 
         if (request()->expectsJson()) {

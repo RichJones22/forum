@@ -29,6 +29,16 @@ class Reply extends Model
      * @var array
      */
     protected $with = ['owner', 'favorites'];
+
+    /**
+     * appends to the model; great for using in js on the client side...
+     * - favoritesCount below uses the "get'FavoritesCount'Attribute" method
+     *   on Favorites Trait.
+     *
+     * @var array
+     */
+    protected $appends = ['favoritesCount', 'isFavorited'];
+
     /**
      * @var PremiseCache
      */
@@ -121,7 +131,7 @@ class Reply extends Model
         // TODO: where and how do we display this error?
         $page = (int)($count / ThreadsController::paginationCount);
 
-        if ($page == 0) {
+        if ($page <= 0) {
             $page = 1;
         }
         return $page;
