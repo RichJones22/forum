@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace app;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use ReflectionClass;
 
 /**
@@ -12,6 +13,30 @@ use ReflectionClass;
  */
 trait RecordsActivity
 {
+    /**
+     * @param string $event
+     *
+     * @throws \ReflectionException
+     */
+    public function recordActivity(String $event)
+    {
+        $this->activity()->create([
+            'user_id' => auth()->id(),
+            'type' => $this->getActivityType($event),
+        ]);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function activity(): MorphMany
+    {
+        /** @var Model $model */
+        $model = $this;
+
+        return $model->morphMany(Activity::class, 'subject');
+    }
+
     protected static function bootRecordsActivity()
     {
         if (auth()->guest()) {
@@ -50,30 +75,10 @@ trait RecordsActivity
 
     /**
      * @param string $event
-     */
-    protected function recordActivity(String $event)
-    {
-        $this->activity()->create([
-            'user_id' => auth()->id(),
-            'type' => $this->getActivityType($event),
-        ]);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    protected function activity()
-    {
-        /** @var Model $model */
-        $model = $this;
-
-        return $model->morphMany(Activity::class, 'subject');
-    }
-
-    /**
-     * @param string $event
      *
      * @return string
+     *
+     * @throws \ReflectionException
      */
     protected function getActivityType(String $event): string
     {

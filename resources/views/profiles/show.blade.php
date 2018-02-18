@@ -10,7 +10,7 @@
                     </h1>
                 </div>
 
-                @foreach($activities as $date => $activity)
+                @forelse($activities as $date => $activity)
                     <h3 class="page-header">{{ $date }}</h3>
 
                     @foreach($activity as $record)
@@ -20,7 +20,9 @@
                             <strong>{{ "missing view: profiles.activities.{$record->type}" }}</strong>
                         @endif
                     @endforeach
-                @endforeach
+                @empty
+                    <p>No activity for this user...</p>
+                @endforelse
             </div>
         </div>
     </div>

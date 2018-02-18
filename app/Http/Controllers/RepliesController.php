@@ -69,6 +69,9 @@ class RepliesController extends Controller
             return response([], 403);
         }
         $reply->delete();
+        if ($reply->isFavorited()) {
+            $reply->unfavorite();
+        }
 
         if (request()->expectsJson()) {
             return response(['status' => 'Reply deleted']);
