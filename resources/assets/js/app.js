@@ -10,6 +10,14 @@ require('./bootstrap');
 // global components object
 window.Vue = require('vue');
 
+Vue.prototype.authorize = function(handler) {
+    // additional admin privileges here...
+
+    let user = window.App.user;
+
+    return user ? handler(user) : false;
+};
+
 // events object
 window.events = new Vue();
 
@@ -25,8 +33,8 @@ window.flash = function (message) {
  */
 
 Vue.component('flash', require('./components/flash.vue'));
-Vue.component('reply', require('./components/reply.vue'));
 Vue.component('favorite', require('./components/favorite.vue'));
+Vue.component('thread-view', require('./pages/Thread.vue'));
 
 const app = new Vue({
    el: '#app'
