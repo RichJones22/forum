@@ -12,12 +12,25 @@ use App\Thread;
  */
 class RepliesController extends Controller
 {
+    const paginationCount = 5;
+
     /**
      * RepliesController constructor.
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => 'index']);
+    }
+
+    /**
+     * @param string $channelId
+     * @param Thread $thread
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function index(string $channelId, Thread $thread)
+    {
+        return $thread->replies()->paginate(self::paginationCount);
     }
 
     /**

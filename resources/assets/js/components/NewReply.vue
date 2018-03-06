@@ -27,7 +27,6 @@
         data() {
             return {
                 body: '',
-                // endpoint: this.endpoint
             }
         },
         computed: {

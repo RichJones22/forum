@@ -1,9 +1,10 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
+// import commonCode from "./mixins/commonCode";
+
 
 require('./bootstrap');
 
@@ -34,8 +35,11 @@ window.flash = function (message) {
 
 Vue.component('flash', require('./components/flash.vue'));
 Vue.component('favorite', require('./components/favorite.vue'));
+Vue.component('paginator', require('./components/paginator'));
 Vue.component('thread-view', require('./pages/Thread.vue'));
 
+
 const app = new Vue({
-   el: '#app'
+    el: '#app',
+    // mixins: [commonCode]
 });

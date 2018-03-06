@@ -6,7 +6,7 @@
                     <a :href="'/profiles/'+data.owner.name"
                         v-text="data.owner.name">
                     </a>
-                    said {{ data.created_at }}...
+                    said <span v-text="ago"></span>
                 </h5>
 
                 <div v-if="signedIn">
@@ -28,18 +28,17 @@
             <div v-else v-text="body"></div>
         </div>
 
-        <!--@can ('update', $reply)-->
-            <div class="panel-footer level" v-if="canUpdate">
-                <button class="btn btn-info btn-xs mr-1" @click="editing = true">Edit</button>
-                <button class="btn btn-danger btn-xs mr-1" @click="destroy">Delete</button>
-            </div>
-        <!--@endcan-->
+        <div class="panel-footer level" v-if="canUpdate">
+            <button class="btn btn-info btn-xs mr-1" @click="editing = true">Edit</button>
+            <button class="btn btn-danger btn-xs mr-1" @click="destroy">Delete</button>
+        </div>
     </div>
 </template>
 
 <script>
 
     import Favorite from './favorite.vue';
+    import moment from 'moment';
 
     export default {
         props: ['data'],
@@ -58,6 +57,9 @@
             canUpdate() {
                 console.log('-- check this');
                 return this.authorize(user => this.data.user_id === user.id);
+            },
+            ago() {
+                return moment(this.data.created_at).fromNow() + '...';
             }
         },
         methods: {

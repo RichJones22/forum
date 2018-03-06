@@ -9,6 +9,11 @@
             return {
                 repliesCount: this.initRepliesCount
             }
-        }
+        },
+        mounted() {
+            console.log('-- Thread.vue --');
+
+            this.$emit('repliesCountIs', this.repliesCount);
+        },
     }
 </script>
