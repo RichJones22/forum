@@ -30,7 +30,18 @@ class RepliesController extends Controller
      */
     public function index(string $channelId, Thread $thread)
     {
-        return $thread->replies()->paginate(self::paginationCount);
+        $page = (int) request()->query('page');
+
+        $pageSet = $thread
+            ->replies()
+            ->paginate(
+                self::paginationCount,
+                null,
+                null,
+                (int) $page
+            );
+
+        return $pageSet;
     }
 
     /**
@@ -69,6 +80,10 @@ class RepliesController extends Controller
         }
 
         $reply->update(['body' => request('body')]);
+
+        if (request()->expectsJson()) {
+            return response(['status' => 'Reply Updated']);
+        }
 
         return $this;
     }

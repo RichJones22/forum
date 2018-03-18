@@ -14,8 +14,11 @@
 </template>
 
 <script>
+    import CommonCode from '../mixins/commonCode';
+
     export default {
         props: ['dataSet'],
+        mixins: [CommonCode],
         data() {
             return {
                 page: 1,
@@ -25,9 +28,10 @@
         },
         watch: {
             dataSet() {
-                this.page = this.dataSet.current_page;
-                this.prevUrl = this.dataSet.prev_page_url;
-                this.nextUrl = this.dataSet.next_page_url;
+                console.log('-- in paginator.vue');
+                this.page = this.currPage();
+                this.prevUrl = this.prevPageUrl();
+                this.nextUrl = this.nextPageUrl();
             },
             page() {
                 this.broadcast().updateUrl();
@@ -47,6 +51,15 @@
             },
             updateUrl() {
                 history.pushState(null, null, `?page=${this.page}`);
+            },
+            currPage() {
+                return this.dataSet.current_page;
+            },
+            prevPageUrl() {
+                return this.convertNullToFalse(this.dataSet.prev_page_url);
+            },
+            nextPageUrl() {
+                return this.convertNullToFalse(this.dataSet.next_page_url);
             }
         }
     }

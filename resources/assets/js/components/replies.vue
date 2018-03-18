@@ -14,7 +14,7 @@
     import Reply from './reply.vue';
     import NewReply from './NewReply.vue';
     import Collection from '../mixins/collections';
-    import CommonCode from "../mixins/commonCode";
+    import CommonCode from '../mixins/commonCode';
 
     export default {
         components: { Reply, NewReply },
@@ -24,7 +24,7 @@
         data() {
             return {
                 dataSet: false,
-                endpoint: window.location.pathname + '/replies'
+                endpoint: location.pathname + '/replies'
             }
         },
         created() {

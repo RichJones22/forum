@@ -68,16 +68,18 @@
 
                 axios.patch('/replies/' + this.data.id, {
                     body: this.body
+                })
+                .then(() => {
+                    this.editing = false;
+
+                    flash('Updated!');
                 });
-
-                this.editing = false;
-
-                flash('Updated!');
             },
             destroy() {
-                axios.delete('/replies/' + this.data.id);
-
-                this.$emit('deleted', this.data.id);
+                axios.delete('/replies/' + this.data.id)
+                    .then(() => {
+                        this.$emit('deleted', this.data.id);
+                    });
             }
         }
     }
