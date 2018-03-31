@@ -7,6 +7,7 @@ namespace App;
 use App\Http\Caching\PremiseCache;
 use App\Http\Controllers\ThreadsController;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Reply.
@@ -29,6 +30,19 @@ class Reply extends Model
      * @var array
      */
     protected $with = ['owner', 'favorites'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function (Reply $reply) {
+            $reply->thread()->increment('replies_count');
+        });
+
+        static::deleted(function (Reply $reply) {
+            $reply->thread()->decrement('replies_count');
+        });
+    }
 
     /**
      * appends to the model; great for using in js on the client side...

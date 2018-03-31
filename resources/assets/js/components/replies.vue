@@ -56,6 +56,9 @@
             refresh({data}) {
                 this.dataSet = data;
                 this.items = data.data;
+
+                // scroll to top of page after each next or previous page is clicked.
+                window.scrollTo(0,0);
             },
         }
     }

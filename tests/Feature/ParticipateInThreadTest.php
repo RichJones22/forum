@@ -27,9 +27,6 @@ class ParticipateInThreadTest extends TestCase
     /** @test */
     public function an_authenticated_user_may_participate_in_forum_threads()
     {
-        //        $this->be($user = create(User::class)); // create persists the db
-                                                     // make does not...
-
         $this->signIn();
 
         /** @var Thread $thread */
@@ -40,8 +37,8 @@ class ParticipateInThreadTest extends TestCase
 
         $this->post($thread->path().'/replies', $reply->toArray());
 
-        $this->get($thread->path())
-            ->assertSee($reply->body);
+        $this->assertDatabaseHas('replies', ['body' => $reply->body]);
+        $this->assertEquals(1, $thread->refresh()->getRepliesCount());
     }
 
     /** @test */
@@ -80,11 +77,17 @@ class ParticipateInThreadTest extends TestCase
     {
         $this->signIn();
 
+        /** @var Reply $reply */
         $reply = create(Reply::class, ['user_id' => auth()->id()]);
 
         $this->delete("/replies/{$reply->id}")->assertStatus(302);
 
         $this->assertDatabaseMissing('replies', ['id' => $reply->id]);
+
+        /** @var Thread $model */
+        $model = $reply->thread()->getModel();
+
+        $this->assertNull($model->getRepliesCount());
     }
 
     /** @test */

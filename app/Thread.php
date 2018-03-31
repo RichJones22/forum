@@ -45,9 +45,9 @@ class Thread extends Model
     public static function boot()
     {
         // exposes Threads->replies_count to all queries...
-        static::addGlobalScope('replyCount', function (Builder $builder) {
-            $builder->withCount('replies');
-        });
+//        static::addGlobalScope('replyCount', function (Builder $builder) {
+//            $builder->withCount('replies');
+//        });
 
         // when deleting a thread, delete all associated replies...
         // this is a model event handler; I'm also tempted to do it as a cascading delete
@@ -142,5 +142,13 @@ class Thread extends Model
     public function scopeFilter($query, ThreadFilters $filters)
     {
         return $filters->apply($query);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRepliesCount()
+    {
+        return $this->replies_count;
     }
 }
