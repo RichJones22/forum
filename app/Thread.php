@@ -6,7 +6,6 @@ namespace App;
 
 use App\Filters\ThreadFilters;
 use App\Http\Caching\PremiseCache;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -150,5 +149,31 @@ class Thread extends Model
     public function getRepliesCount()
     {
         return $this->replies_count;
+    }
+
+    /**
+     * @param int|null $userId
+     */
+    public function subscribe(int $userId = null)
+    {
+        $this->subscriptions()->create([
+           'user_id' => $userId ?: auth()->id(),
+        ]);
+    }
+
+    /**
+     * @param int|null $userId
+     */
+    public function unsubscribe(int $userId = null)
+    {
+        $this
+            ->subscriptions()
+            ->where('user_id', $userId ?: auth()->id())
+            ->delete();
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(ThreadSubscription::class);
     }
 }
