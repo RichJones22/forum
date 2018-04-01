@@ -19,11 +19,18 @@ class TrustProxies extends Middleware
      *
      * @var array
      */
-    protected $headers = [
-        Request::HEADER_FORWARDED => 'FORWARDED',
-        Request::HEADER_X_FORWARDED_FOR => 'X_FORWARDED_FOR',
-        Request::HEADER_X_FORWARDED_HOST => 'X_FORWARDED_HOST',
-        Request::HEADER_X_FORWARDED_PORT => 'X_FORWARDED_PORT',
-        Request::HEADER_X_FORWARDED_PROTO => 'X_FORWARDED_PROTO',
-    ];
+
+    // framework changed in 5.6, see framework documentation
+    // upgrading from 5.5 to 5.6, 'Trusted Proxies'
+    // - leaving the below commented out... If you see this remove it...
+
+//    protected $headers = [
+//        Request::HEADER_FORWARDED => 'FORWARDED',
+//        Request::HEADER_X_FORWARDED_FOR => 'X_FORWARDED_FOR',
+//        Request::HEADER_X_FORWARDED_HOST => 'X_FORWARDED_HOST',
+//        Request::HEADER_X_FORWARDED_PORT => 'X_FORWARDED_PORT',
+//        Request::HEADER_X_FORWARDED_PROTO => 'X_FORWARDED_PROTO',
+//    ];
+
+    protected $headers = Request::HEADER_X_FORWARDED_ALL;
 }
