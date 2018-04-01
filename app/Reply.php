@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Http\Caching\PremiseCache;
+use App\Http\Controllers\RepliesController;
 use App\Http\Controllers\ThreadsController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -143,7 +144,7 @@ class Reply extends Model
 
         // TODO: we should through an error if paginationCount is 0
         // TODO: where and how do we display this error?
-        $page = (int)($count / ThreadsController::paginationCount);
+        $page = (int)($count / RepliesController::paginationCount);
 
         if ($page <= 0) {
             $page = 1;
