@@ -71,6 +71,15 @@ class ThreadTest extends TestCase
         $this->assertInstanceOf(Channel::class, $thread->channel);
     }
 
+    /** @test */
+    public function a_thread_can_be_subscribed_to()
+    {
+        // Given we have a thread
+        // and an authenticated user
+        // when the user subscribes to the thread.
+        // then we should fetch all threads that the user has subscribed to.
+    }
+
     /**
      * @return Thread
      */
