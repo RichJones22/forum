@@ -26,6 +26,11 @@ class Thread extends Model
     protected $with = ['creator', 'channel'];
 
     /**
+     * @var array
+     */
+    protected $appends = ['isSubscribedTo'];
+
+    /**
      * Thread constructor.
      *
      * @param array $attributes
@@ -172,8 +177,21 @@ class Thread extends Model
             ->delete();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function subscriptions()
     {
         return $this->hasMany(ThreadSubscription::class);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsSubscribedToAttribute()
+    {
+        return $this->subscriptions()
+            ->where('user_id', auth()->id())
+            ->exists();
     }
 }
