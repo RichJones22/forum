@@ -155,7 +155,7 @@ class Thread extends Model
         // technique 2 -- preferred; plan old foreach loop
         // prepare notifications for all subscribers
         foreach ($subscriptions as $subscription) {
-            if ($subscription->user_id !== $reply->user_id) {
+            if ($subscription->user_id != $reply->user_id) {
                 $subscription->user->notify(new ThreadWasUpdated($this, $reply));
             }
         }
