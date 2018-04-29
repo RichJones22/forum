@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -22,13 +24,7 @@ class SubscribeToThreadsTest extends TestCase
         // And we subscribe to the thread
         $this->post($thread->path().'/subscriptions');
 
-        // then, each time a new a reply is left
-        $thread->addReply([
-           'user_id' => auth()->id(),
-           'body' => 'Some reply here.',
-        ]);
-
-        $this->assertCount(1, auth()->user()->notifications);
+        $this->assertCount(1, $thread->fresh()->subscriptions()->get());
     }
 
     /** @test */

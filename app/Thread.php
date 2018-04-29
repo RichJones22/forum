@@ -6,6 +6,7 @@ namespace App;
 
 use App\Filters\ThreadFilters;
 use App\Http\Caching\PremiseCache;
+use App\Notifications\ThreadWasUpdated;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -134,7 +135,32 @@ class Thread extends Model
      */
     public function addReply($reply)
     {
-        return $this->replies()->create($reply);
+        /** @var Reply $reply */
+        $reply = $this->replies()->create($reply);
+
+        $subscriptions = $this->subscriptions()->get();
+
+        // see episode 43 around the 16 minute mark...
+        // technique 1 and 2 below yield the same results...
+        // technique 1; using collections
+//        $subscriptions->filter(function($sub) use ($reply){
+//            return $sub->user_id != $reply->user_id;
+//        })
+//      -- there is also a high order technique as well
+//      -- so refer to the video; episode 43 around the 16 minute mark...
+//        ->each(function($sub) use ($reply) {
+//            $sub->user->notify(new ThreadWasUpdated($this, $reply));
+//        });
+
+        // technique 2 -- preferred; plan old foreach loop
+        // prepare notifications for all subscribers
+        foreach ($subscriptions as $subscription) {
+            if ($subscription->user_id !== $reply->user_id) {
+                $subscription->user->notify(new ThreadWasUpdated($this, $reply));
+            }
+        }
+
+        return $reply;
     }
 
     /**
@@ -158,12 +184,16 @@ class Thread extends Model
 
     /**
      * @param int|null $userId
+     *
+     * @return Thread
      */
     public function subscribe(int $userId = null)
     {
         $this->subscriptions()->create([
            'user_id' => $userId ?: auth()->id(),
         ]);
+
+        return $this;
     }
 
     /**
