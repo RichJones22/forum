@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
@@ -54,7 +56,8 @@ class ThreadWasUpdated extends Notification
     public function toArray($notifiable)
     {
         return [
-            'message' => 'temporary placeholder.',
+            'message' => $this->reply->owner->name.' replied to '.$this->thread->title,
+            'link' => $this->reply->path(),
         ];
     }
 }
