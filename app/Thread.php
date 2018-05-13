@@ -56,7 +56,7 @@ class Thread extends Model
 
         // when deleting a thread, delete all associated replies...
         // this is a model event handler; I'm also tempted to do it as a cascading delete
-        // off of the Tread table itself.
+        // off of the Thread table itself.
         // TODO:  the below seems a bit excessive; is there a better way?
         static::deleting(function (Thread $thread) {
             if ($thread->replies()->exists()) {
@@ -83,6 +83,7 @@ class Thread extends Model
                             ->delete();
                     }
 
+                    // delete favorites
                     $favorite->newQuery()
                         ->where('favorited_id', $x->id)
                         ->delete();
@@ -138,27 +139,7 @@ class Thread extends Model
         /** @var Reply $reply */
         $reply = $this->replies()->create($reply);
 
-        $subscriptions = $this->subscriptions()->get();
-
-        // see episode 43 around the 16 minute mark...
-        // technique 1 and 2 below yield the same results...
-        // technique 1; using collections
-//        $subscriptions->filter(function($sub) use ($reply){
-//            return $sub->user_id != $reply->user_id;
-//        })
-//      -- there is also a high order technique as well
-//      -- so refer to the video; episode 43 around the 16 minute mark...
-//        ->each(function($sub) use ($reply) {
-//            $sub->user->notify(new ThreadWasUpdated($this, $reply));
-//        });
-
-        // technique 2 -- preferred; plan old foreach loop
-        // prepare notifications for all subscribers
-        foreach ($subscriptions as $subscription) {
-            if ($subscription->user_id != $reply->user_id) {
-                $subscription->user->notify(new ThreadWasUpdated($this, $reply));
-            }
-        }
+        $this->notifySubscribers($reply);
 
         return $reply;
     }
@@ -223,5 +204,40 @@ class Thread extends Model
         return $this->subscriptions()
             ->where('user_id', auth()->id())
             ->exists();
+    }
+
+    /**
+     * @param $reply
+     */
+    protected function notifySubscribers($reply): void
+    {
+        $subscriptions = $this->subscriptions()->get();
+
+        // see episode 43 around the 16 minute mark...
+        // technique 1 and 2 below yield the same results...
+        // technique 1; using collections
+//        $subscriptions->filter(function($sub) use ($reply){
+//            return $sub->user_id != $reply->user_id;
+//        })
+//      -- there is also a high order technique as well
+//      -- so refer to the video; episode 43 around the 16 minute mark...
+//        ->each(function($sub) use ($reply) {
+//            $sub->user->notify(new ThreadWasUpdated($this, $reply));
+//        });
+
+        // technique 2 -- preferred; plan old foreach loop
+        // prepare notifications for all subscribers
+        foreach ($subscriptions as $subscription) {
+            if ($subscription->user_id !== $reply->user_id) {
+                $subscription->user->notify(new ThreadWasUpdated($this, $reply));
+            }
+        }
+
+        // yet another technique is the below
+        // I don't like this because it uses a magic method each
+//        $this->subscriptions()
+//            ->where('user_id', '!=', $reply->user_id)
+//            ->each
+//            ->notify($reply);
     }
 }

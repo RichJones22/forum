@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Channel;
+use App\Notifications\ThreadWasUpdated;
 use App\Thread;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Tests\TestCase;
 
 /**
@@ -61,6 +64,25 @@ class ThreadTest extends TestCase
         ]);
 
         $this->assertCount(1, $this->getThread()->replies);
+    }
+
+    /** @test */
+    public function a_thread_notifies_all_registered_subscribers_when_a_reply_is_added()
+    {
+        /** @var NotificationFake $fake */
+        $fake = Notification::fake();
+
+        $this->signIn();
+
+        $this->thread->subscribe();
+
+        // reply needs to be from a different user
+        $this->thread->addReply([
+            'body' => 'foobar',
+            'user_id' => create(User::class)->id,
+        ]);
+
+        $fake->assertSentTo(auth()->user(), ThreadWasUpdated::class);
     }
 
     /** @test */
