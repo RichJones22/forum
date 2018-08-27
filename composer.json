@@ -55,16 +55,23 @@
             "@php artisan package:discover"
         ],
         "post-install-cmd": [
-            "php artisan ide-helper:generate",
-            "php artisan ide-helper:meta",
+            "composer app-refresh"
+        ],
+        "app-refresh": [
             "php artisan cache:clear",
             "php artisan view:clear",
             "php artisan route:clear",
             "php artisan clear-compiled",
             "redis-cli flushall"
         ],
-        "tinkerLoad": [
-            "php artisan db:seed --class=RunTinkerLoadCommand"
+        "ide-helper-refresh": [
+            "php artisan ide-helper:generate",
+            "php artisan ide-helper:meta"
+        ],
+        "bringAppUp": [
+            "php artisan db:seed --class=RunTinkerLoadCommand",
+            "composer ide-helper-refresh",
+            "composer app-refresh"
         ]
     },
     "config": {

@@ -7,6 +7,7 @@ namespace App;
 use App\Filters\ThreadFilters;
 use App\Http\Caching\PremiseCache;
 use App\Notifications\ThreadWasUpdated;
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -239,5 +240,20 @@ class Thread extends Model
 //            ->where('user_id', '!=', $reply->user_id)
 //            ->each
 //            ->notify($reply);
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     * @throws \Exception
+     */
+    public function hasUpdatesFor(User $user)
+    {
+        /** @var User $user */
+//        $user = $user ?: auth()->user();
+
+        $key = $user->visitedThreadCacheKey($this);
+
+        return $this->updated_at > cache($key);
     }
 }

@@ -28,8 +28,19 @@ class RunTinkerLoadCommand extends Seeder
             return;
         }
 
+        // clear the terminal...
+        system('clear');
+
+        echo"\n";
+        echo "running artisan migrate:refresh";
+        echo"\n";
+
         // refresh the database.
         Artisan::call('migrate:refresh');
+
+        echo"\n";
+        echo "seeding the database";
+        echo"\n";
 
         // run tinker load commands to populate the threads, replies, channels, and users tables.
         // please see the factories/UserFactory.php file for the specifics...
@@ -39,7 +50,7 @@ class RunTinkerLoadCommand extends Seeder
         });
 
         echo"\n";
-        echo"Tinker Load Command succeeded.\n";
+        echo"App is ready\n";
         echo"\n";
     }
 }

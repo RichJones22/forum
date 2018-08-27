@@ -8,6 +8,7 @@ use App\Channel;
 use App\Notifications\ThreadWasUpdated;
 use App\Thread;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
@@ -139,6 +140,30 @@ class ThreadTest extends TestCase
         $thread->subscribe();
 
         $this->assertTrue($thread->isSubscribedTo);
+    }
+
+    /** @test
+     * @throws \Exception
+     */
+    public function a_thread_can_check_if_the_authenticated_user_has_read_all_replies()
+    {
+        $this->signIn();
+
+        /** @var Thread $thread */
+        $thread = create(Thread::class);
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        // the user has not read the thread.
+        $this->assertTrue($thread->hasUpdatesFor($user));
+
+
+        // simulate that the use has read the thread
+        $key = $user->visitedThreadCacheKey($thread);
+        cache()->forever($key, Carbon::now());
+
+        $this->assertFalse($thread->hasUpdatesFor($user));
     }
 
     /**

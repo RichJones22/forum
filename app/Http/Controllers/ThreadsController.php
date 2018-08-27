@@ -8,11 +8,11 @@ use App\Channel;
 use App\Filters\ThreadFilters;
 use App\Thread;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -110,10 +110,14 @@ class ThreadsController extends Controller
      * @param $channel
      * @param Thread $thread
      *
-     * @return Thread
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     *
+     * @throws \Exception
      */
     public function show($channel, Thread $thread)
     {
+        $this->cacheThatTheThreadWasVisited($thread);
+
         return view('threads.show', [
             'thread' => $thread,
         ]);
@@ -148,7 +152,7 @@ class ThreadsController extends Controller
         $this->authorize('update', $thread);
 
         try {
-            DB::transaction(function () use ($thread) {
+            \DB::transaction(function () use ($thread) {
                 // Note: that the below delete() method is calling the model
                 // event handler (deleting), which will delete the replies for
                 // this thread.
@@ -256,5 +260,29 @@ class ThreadsController extends Controller
             ->get();
 
         return $threads;
+    }
+
+    /**
+     * @param Thread $thread
+     *
+     * @throws \Exception
+     */
+    protected function cacheThatTheThreadWasVisited(Thread $thread): void
+    {
+        /*
+         * - This method stores that the user has clicked on a thread.
+         * - This allows for the bold and un-bold of the threads title
+         *   as a visual queue that the user has new threads.
+         */
+
+        if (is_null($user = auth()->user())) {
+            $user = new User();
+        }
+
+        // if we don't have a user id, no need to cache the thread visit...
+        if ( ! is_null($user->id)) {
+            $key = $user->visitedThreadCacheKey($thread);
+            cache()->forever($key, Carbon::now());
+        }
     }
 }
