@@ -39,13 +39,14 @@ class Thread extends Model
      */
     public function __construct(array $attributes = [])
     {
+        parent::boot();
+
         parent::__construct($attributes);
 
         // weird... need the below Activity() call, otherwise the call to
         // the trait bootRecordsActivity() will not work?
         app(Activity::class);
 
-        parent::boot();
     }
 
     public static function boot()
