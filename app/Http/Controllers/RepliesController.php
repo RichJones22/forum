@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Spam\Spam;
 use App\Reply;
 use App\Thread;
 
@@ -47,14 +48,19 @@ class RepliesController extends Controller
     /**
      * @param $channelId
      * @param Thread $thread
+     * @param Spam   $spam
      *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Http\RedirectResponse
+     *
+     * @throws \Exception
      */
-    public function store($channelId, Thread $thread)
+    public function store($channelId, Thread $thread, Spam $spam)
     {
         $this->validate(request(), [
             'body' => 'required',
         ]);
+
+        $spam->detect(request('body'));
 
         $reply = $thread->addReply([
             'body' => request('body'),
