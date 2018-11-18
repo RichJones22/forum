@@ -11,5 +11,28 @@ let mix = require('laravel-mix');
  |
  */
 
+if (process.env.NODE_ENV === 'production') {
+    mix
+        .options({
+            uglify: {
+                uglifyOptions: {
+                    compress: {
+                        drop_console: true, // suppress console.log() messages.
+                    },
+                    output: {
+                        max_line_len: 50000, // suppress warning 'WARN: Output exceeds 32000 characters'
+                    }
+                },
+            },
+        });
+
+}
+
 mix.js('resources/assets/js/app.js', 'public/js')
    .sass('resources/assets/sass/app.scss', 'public/css');
+
+// if we are in production babel compile our app.js and minify and version all .js and .css
+if (process.env.NODE_ENV === 'production') {
+    mix
+        .version();
+}
