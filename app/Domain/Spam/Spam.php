@@ -1,11 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Domain\Spam;
 
+use App\Domain\Spam\Contract\InspectionsContract;
+use App\Domain\Spam\Inspections\InvalidKeywords;
+use App\Domain\Spam\inspections\KeyHeldDown;
 use Exception;
 
 class Spam
 {
+    protected $inspections = [
+        InvalidKeywords::class,
+        KeyHeldDown::class,
+    ];
+
     /**
      * @param $body
      *
@@ -15,26 +25,13 @@ class Spam
      */
     public function detect($body)
     {
-        $this->detectInvalidKeywords($body);
+        foreach ($this->inspections as $inspection) {
+            /** @var InspectionsContract $myInspection */
+            $myInspection = new $inspection();
+
+            $myInspection->detect($body);
+        }
 
         return false;
-    }
-
-    /**
-     * @param $body
-     *
-     * @throws Exception
-     */
-    public function detectInvalidKeywords($body)
-    {
-        $invalidKeywords = [
-            'yahoo customer support',
-        ];
-
-        foreach ($invalidKeywords as $keyword) {
-            if (stripos($body, $keyword) !== false) {
-                throw new Exception('your reply contains spam');
-            }
-        }
     }
 }

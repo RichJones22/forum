@@ -85,6 +85,8 @@ class ThreadsController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
@@ -182,7 +184,7 @@ class ThreadsController extends Controller
      *
      * @return ThreadsController
      */
-    public function setThread(Thread $thread): ThreadsController
+    public function setThread(Thread $thread): self
     {
         $this->thread = $thread;
 
@@ -202,7 +204,7 @@ class ThreadsController extends Controller
      *
      * @return ThreadsController
      */
-    public function setUser(User $user): ThreadsController
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -222,7 +224,7 @@ class ThreadsController extends Controller
      *
      * @return ThreadsController
      */
-    public function setRequest(Request $request): ThreadsController
+    public function setRequest(Request $request): self
     {
         $this->request = $request;
 
@@ -275,12 +277,12 @@ class ThreadsController extends Controller
          *   as a visual queue that the user has new threads.
          */
 
-        if (is_null($user = auth()->user())) {
+        if (null === ($user = auth()->user())) {
             $user = new User();
         }
 
         // if we don't have a user id, no need to cache the thread visit...
-        if ( ! is_null($user->id)) {
+        if (null !== $user->id) {
             $key = $user->visitedThreadCacheKey($thread);
             cache()->forever($key, Carbon::now());
         }
